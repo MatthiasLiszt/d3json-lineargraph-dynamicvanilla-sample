@@ -1,0 +1,124 @@
+<html>
+<title>d3 stock market json test </title> 
+<style>
+path {
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+ 
+line {
+    stroke: black;
+}
+ 
+text {
+    font-family: Arial;
+    font-size: 9pt;
+}
+</style>
+<script src="d3.v3.min.js" type="text/javascript"></script>
+<script>
+var data={"Labels":null,"Positions":[0,0.25,0.5,0.75,1],"Dates":["2017-05-22T00:00:00","2017-05-23T00:00:00","2017-05-24T00:00:00","2017-05-25T00:00:00","2017-05-26T00:00:00"],"Elements":[{"Currency":"USD","TimeStamp":null,"Symbol":"IBM","Type":"price","DataSeries":{"open":{"min":152.1,"max":153.25,"maxDate":"2017-05-25T00:00:00","minDate":"2017-05-22T00:00:00","values":[152.1,152.57,152.21,153.25,152.85]},"high":{"min":152.76,"max":153.73,"maxDate":"2017-05-25T00:00:00","minDate":"2017-05-24T00:00:00","values":[152.84,153.68,152.76,153.73,153]},"low":{"min":151.23,"max":152.946,"maxDate":"2017-05-25T00:00:00","minDate":"2017-05-24T00:00:00","values":[151.599,151.92,151.23,152.946,152.06]},"close":{"min":152.03,"max":153.2,"maxDate":"2017-05-25T00:00:00","minDate":"2017-05-23T00:00:00","values":[152.64,152.03,152.51,153.2,152.49]}}}]};
+</script>
+
+<body>
+diagram data from JSON of market API 
+<div id="output">...</div> 
+<div id="diagram">...</div> 
+<script>
+var i,v=data.Elements[0].DataSeries.open.values;
+var acourses=[],ccourses,iH=document.getElementById("output");
+var dates=data.Dates;
+
+console.log("executing js in d3stock.html");
+
+for(i=0;i<5;++i)
+ {acourses.push(v[i]);}
+
+ccourses=JSON.stringify(acourses);
+iH.innerHTML=ccourses;
+console.log(ccourses);
+
+// Visualization With D3 
+
+var cdata = acourses;
+var w = 400, h = 200,margin = 60;
+var y = d3.scale.linear().domain([d3.min(cdata), d3.max(cdata)]).range([ h - margin, margin]);
+var x = d3.scale.linear().domain([0, cdata.length]).range([margin, w - margin]);
+var xAxis = d3.svg.axis().scale(x);
+var yAxis = d3.svg.axis().scale(y).orient("left");
+
+var vis = d3.select("#diagram")
+    .append("svg:svg")
+    .attr("width", w)
+    .attr("height", h);
+ 
+var down="translate(0,"+(h-margin) +")";
+
+vis.append("svg:g").attr("transform", down).call(xAxis);
+vis.append("svg:g").attr("transform", "translate(" + (margin) + ",0)").call(yAxis);
+
+var lineGen = d3.svg.line()
+  .x(function(d,i) {
+    console.log("x="+i);
+    return x(i);
+  })
+  .y(function(d) {
+    console.log("y="+d); 
+    return y(d);
+  });
+
+var fGen = d3.svg.line()
+  .x(function(d,i) {
+    return x(i);
+  })
+  .y(function(d) {
+    return y(d+0.1);
+  });
+
+
+vis.append('svg:path')
+  .attr('d', lineGen(cdata))
+  .attr('stroke', 'green')
+  .attr('stroke-width', 2)
+  .attr('fill', 'none');
+
+vis.append('svg:path')
+  .attr('d', fGen(cdata))
+  .attr('stroke', 'red')
+  .attr('stroke-width', 1)
+  .attr('fill', 'none');
+
+// add remove-button 
+
+var parent=document.getElementById("diagram");
+var removeButton = document.createElement("input");
+//var tnode=document.createTextNode("remove");
+//removeButton.appendChild(tnode);
+
+
+var ndiv = document.createElement("div");
+ndiv.id="diagram1";
+ndiv.innerHTML=ndiv.id+" created."
+parent.appendChild(ndiv);
+
+var granny= document.getElementById("diagram1");
+
+removeButton.type="button";
+removeButton.value="remove";
+removeButton.id="removeButton";
+removeButton.onclick=function(){removeDiagram();};
+granny.appendChild(removeButton);
+
+// additional functions
+
+function removeDiagram(){
+  d3.select("#diagram").remove();
+}
+
+
+</script>
+
+</body>
+</html> 
+
